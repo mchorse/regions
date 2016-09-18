@@ -1,0 +1,16 @@
+[
+	{
+		"modid": "regions",
+		"name": "Regions",
+		"description": "Example placeholder mod.",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+  		"url": "",
+		"updateUrl": "",
+		"authorList": ["mchorse"],
+		"credits": "The Forge and FML guys, for making Forge",
+		"logoFile": "",
+		"screenshots": [],
+		"dependencies": []
+	}
+]
