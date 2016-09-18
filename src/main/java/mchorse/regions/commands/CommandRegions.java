@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import mchorse.regions.Regions;
+import mchorse.regions.regions.RegionRange;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -33,6 +34,10 @@ public class CommandRegions extends CommandBase
         return "regions.usage";
     }
 
+    /**
+     * Execute the command. Delegate sub-actions to private methods of this 
+     * command.
+     */
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
@@ -102,17 +107,9 @@ public class CommandRegions extends CommandBase
         try
         {
             RandomAccessFile file = new RandomAccessFile(region, "rw");
+            RegionRange result = new RegionRange(min, max);
 
-            /* Minimum */
-            file.writeInt(min.getX());
-            file.writeInt(min.getY());
-            file.writeInt(min.getZ());
-
-            /* Maximum */
-            file.writeInt(max.getX());
-            file.writeInt(max.getY());
-            file.writeInt(max.getZ());
-
+            result.write(file);
             file.close();
         }
         catch (IOException e)
@@ -128,7 +125,7 @@ public class CommandRegions extends CommandBase
      * 
      * @todo implement
      */
-    private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state)
+    private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {
 
     }
@@ -138,7 +135,7 @@ public class CommandRegions extends CommandBase
      * 
      * @todo implement
      */
-    private void restoreRegion(MinecraftServer server, ICommandSender sender, String name, String state)
+    private void restoreRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {
 
     }
