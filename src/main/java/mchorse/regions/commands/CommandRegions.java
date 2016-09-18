@@ -1,11 +1,17 @@
 package mchorse.regions.commands;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+import mchorse.regions.Regions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 
 /**
  * Command /regions
@@ -71,12 +77,50 @@ public class CommandRegions extends CommandBase
 
     /**
      * Define a region 
-     * 
-     * @todo implement
      */
-    private void defineRegion(MinecraftServer server, ICommandSender sender, String name, BlockPos min, BlockPos max)
+    private void defineRegion(MinecraftServer server, ICommandSender sender, String name, BlockPos min, BlockPos max) throws CommandException
     {
+        int dx = max.getX() - min.getX();
+        int dy = max.getY() - min.getY();
+        int dz = max.getZ() - min.getZ();
 
+        if (Math.abs(dx) == 0 || Math.abs(dy) == 0 || Math.abs(dz) == 0)
+        {
+            throw new CommandException("regions.error.zero_coord", dx, dy, dz);
+        }
+
+        File folder = Regions.serverFile("regions/" + name + "/");
+        File region = Regions.serverFile("regions/" + name + "/region.dat");
+
+        if (region.exists())
+        {
+            throw new CommandException("regions.error.region_defined", name);
+        }
+
+        folder.mkdirs();
+
+        try
+        {
+            RandomAccessFile file = new RandomAccessFile(region, "rw");
+
+            /* Minimum */
+            file.writeInt(min.getX());
+            file.writeInt(min.getY());
+            file.writeInt(min.getZ());
+
+            /* Maximum */
+            file.writeInt(max.getX());
+            file.writeInt(max.getY());
+            file.writeInt(max.getZ());
+
+            file.close();
+        }
+        catch (IOException e)
+        {
+            throw new CommandException("regions.error.io", e.getMessage());
+        }
+
+        sender.addChatMessage(new TextComponentTranslation("regions.success.region_defined", name));
     }
 
     /**

@@ -1,4 +1,14 @@
 #PARSE_ESCAPES
 
 # Commands
+
 regions.usage=/region define <region> <x1> <y1> <z1> <x2> <y2> <z2>\n/region save <region> <state>\n/region restore <region> <state>
+
+# Error messages
+regions.error.io=IO error has occurred:\n%s
+
+regions.error.zero_coord=The difference (%d, %d, %d) between one of coordinates is zero!
+regions.error.region_defined=Region by name "%s" is already defined!
+
+# Success messages
+regions.success.region_defined=Region by name "%s" was successfully defined!
