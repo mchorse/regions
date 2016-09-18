@@ -1,0 +1,4 @@
+#PARSE_ESCAPES
+
+# Commands
+regions.usage=/region define <region> <x1> <y1> <z1> <x2> <y2> <z2>\n/region save <region> <state>\n/region restore <region> <state>

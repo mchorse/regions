@@ -1,9 +1,13 @@
 package mchorse.regions;
 
+import mchorse.regions.commands.CommandRegions;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
+/**
+ * Regions mod
+ */
 @Mod(modid = Regions.MODID, version = Regions.VERSION, serverSideOnly = true)
 public class Regions
 {
@@ -13,6 +17,6 @@ public class Regions
     @EventHandler
     public void registerCommands(FMLServerStartingEvent event)
     {
-        /* Register regions command */
+        event.registerServerCommand(new CommandRegions());
     }
 }
