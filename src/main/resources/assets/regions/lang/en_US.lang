@@ -12,3 +12,4 @@ regions.error.region_defined=Region by name "%s" is already defined!
 
 # Success messages
 regions.success.region_defined=Region by name "%s" was successfully defined!
+regions.success.region_saved=Region by name "%s" was successfully saved to state "%s"!

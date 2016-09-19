@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import mchorse.regions.Regions;
+import mchorse.regions.regions.RegionExporter;
 import mchorse.regions.regions.RegionRange;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -127,7 +128,30 @@ public class CommandRegions extends CommandBase
      */
     private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {
+        File region = Regions.serverFile("regions/" + name + "/region.dat");
+        File save = Regions.serverFile("regions/" + name + "/" + state + "/");
 
+        save.mkdirs();
+
+        RegionRange range = new RegionRange();
+
+        try
+        {
+            RandomAccessFile file = new RandomAccessFile(region, "rw");
+
+            range.read(file);
+            file.close();
+
+            RegionExporter exporter = new RegionExporter(range, server.worldServerForDimension(0));
+
+            exporter.export(save);
+        }
+        catch (IOException e)
+        {
+            throw new CommandException("regions.error.io", e.getMessage());
+        }
+
+        sender.addChatMessage(new TextComponentTranslation("regions.success.region_saved", name, state));
     }
 
     /**
