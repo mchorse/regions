@@ -30,6 +30,7 @@ public class RegionExporter
 
     public NBTTagList tiles = new NBTTagList();
     public NBTTagList entities = new NBTTagList();
+    public boolean saveEntities = true;
 
     public RegionExporter(RegionRange range, World world)
     {
@@ -113,6 +114,11 @@ public class RegionExporter
      */
     private void saveEntities(File folder) throws IOException
     {
+        if (!this.saveEntities)
+        {
+            return;
+        }
+
         AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
         NBTTagCompound output = new NBTTagCompound();
         List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, aabb);

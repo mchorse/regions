@@ -2,7 +2,7 @@
 
 # Commands
 
-regions.usage=/region define <region> <x1> <y1> <z1> <x2> <y2> <z2>\n/region save <region> <state>\n/region restore <region> <state>
+regions.usage=Regions command provide ability to define a region in your world. Further, you can save and restore blocks, entities and tile entities in the defined region. There are following syntaxes of this command available:\n\n/region define <region> <x1> <y1> <z1> <x2> <y2> <z2>\n/region save <region> <state> [save_entities]\n/region restore <region> <state>
 
 # Error messages
 regions.error.io=IO error has occurred:\n%s

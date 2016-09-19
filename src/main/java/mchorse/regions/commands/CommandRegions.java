@@ -69,8 +69,9 @@ public class CommandRegions extends CommandBase
         {
             String name = args[1];
             String state = args[2];
+            boolean saveEntities = args.length >= 4 ? CommandBase.parseBoolean(args[3]) : true;
 
-            this.saveRegion(server, sender, name, state);
+            this.saveRegion(server, sender, name, state, saveEntities);
         }
         else if (action.equals("restore") && args.length >= 3)
         {
@@ -140,7 +141,7 @@ public class CommandRegions extends CommandBase
      * This method is responsible for validation of input data, i.e. if region 
      * exists. If region exists, then current state of region will be saved. 
      */
-    private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
+    private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state, boolean saveEntities) throws CommandException
     {
         File region = Regions.serverFile("regions/" + name + "/region.dat");
         File save = Regions.serverFile("regions/" + name + "/" + state + "/");
@@ -163,6 +164,7 @@ public class CommandRegions extends CommandBase
 
             RegionExporter exporter = new RegionExporter(range, server.worldServerForDimension(0));
 
+            exporter.saveEntities = saveEntities;
             exporter.exportRegion(save);
         }
         catch (IOException e)
