@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -26,6 +27,10 @@ public class RegionImporter
         this.world = world;
     }
 
+    /**
+     * Import given state from folder to the defined region. This method restores 
+     * blocks and entities and tile entities, if those are exist. 
+     */
     public void importRegion(File folder) throws IOException
     {
         File blocks = new File(folder + "/blocks.dat");
@@ -49,31 +54,14 @@ public class RegionImporter
 
         file.close();
 
-        File entityFile = new File(folder + "/entities.dat");
-
-        if (!entityFile.exists()) return;
-
-        /* Remove all entities within region */
-        AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
-
-        for (Entity entity : world.getEntitiesWithinAABB(Entity.class, aabb))
-        {
-            entity.setDead();
-        }
-
-        /* Load entities */
-        NBTTagCompound entities = CompressedStreamTools.read(entityFile);
-        NBTTagList list = (NBTTagList) entities.getTag("Entities");
-
-        for (int i = 0; i < list.tagCount(); i++)
-        {
-            NBTTagCompound tag = list.getCompoundTagAt(i);
-            EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag, world);
-
-            world.spawnEntityInWorld(entity);
-        }
+        /* Restore entities */
+        this.restoreTileEntities(folder);
+        this.restoreEntities(folder);
     }
 
+    /**
+     * Restore block at given coordinates from file
+     */
     @SuppressWarnings("deprecation")
     private void restoreBlock(RandomAccessFile file, int i, int j, int k) throws IOException
     {
@@ -83,5 +71,72 @@ public class RegionImporter
         Block block = Block.getBlockById(id);
 
         world.setBlockState(this.range.min.add(i, j, k), block.getStateFromMeta(meta));
+    }
+
+    /**
+     * Restore tile entities in the given state folder. 
+     */
+    private void restoreTileEntities(File folder) throws IOException
+    {
+        File tiles = new File(folder + "/tiles.dat");
+
+        if (!tiles.exists())
+        {
+            return;
+        }
+
+        NBTTagCompound tag = CompressedStreamTools.read(tiles);
+        NBTTagList entities = (NBTTagList) tag.getTag("Tiles");
+
+        if (entities.tagCount() == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < entities.tagCount(); i++)
+        {
+            TileEntity entity = TileEntity.create(entities.getCompoundTagAt(i));
+
+            world.setTileEntity(entity.getPos(), entity);
+        }
+    }
+
+    /**
+     * Restore entities from separate file "entities.dat" in given state 
+     * folder. 
+     */
+    private void restoreEntities(File folder) throws IOException
+    {
+        File entityFile = new File(folder + "/entities.dat");
+
+        if (!entityFile.exists())
+        {
+            return;
+        }
+
+        /* Load entities */
+        NBTTagCompound entities = CompressedStreamTools.read(entityFile);
+        NBTTagList list = (NBTTagList) entities.getTag("Entities");
+
+        if (list.tagCount() == 0)
+        {
+            return;
+        }
+
+        /* Remove all entities within region */
+        AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
+
+        for (Entity entity : world.getEntitiesWithinAABB(Entity.class, aabb))
+        {
+            entity.setDead();
+        }
+
+        for (int i = 0; i < list.tagCount(); i++)
+        {
+            NBTTagCompound tag = list.getCompoundTagAt(i);
+            EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag, world);
+
+            world.spawnEntityInWorld(entity);
+        }
     }
 }

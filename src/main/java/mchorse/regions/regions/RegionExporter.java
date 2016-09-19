@@ -3,6 +3,7 @@ package mchorse.regions.regions;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -11,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,6 +37,10 @@ public class RegionExporter
         this.world = world;
     }
 
+    /**
+     * This method is responsible for exporting blocks and tile entities and 
+     * entities if those are exist, in the given region (passed in constructor). 
+     */
     public void exportRegion(File folder) throws IOException
     {
         File blocks = new File(folder + "/blocks.dat");
@@ -57,10 +63,63 @@ public class RegionExporter
         file.close();
 
         /* Save entities */
-        AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
+        this.saveTileEntities(folder);
+        this.saveEntities(folder);
+    }
+
+    /**
+     * Save a block to the file and add its tile entity to the tiles list if 
+     * it's not a null. 
+     */
+    private void saveBlock(RandomAccessFile file, int i, int j, int k) throws IOException
+    {
+        BlockPos pos = this.range.min.add(i, j, k);
+        IBlockState state = world.getBlockState(pos);
+
+        int id = Block.getIdFromBlock(state.getBlock());
+        int meta = state.getBlock().getMetaFromState(state);
+
+        file.writeShort(id);
+        file.writeByte(meta);
+
+        /* Add tile entity to tiles list */
+        TileEntity tile = world.getTileEntity(pos);
+
+        if (tile != null)
+        {
+            this.tiles.appendTag(tile.writeToNBT(new NBTTagCompound()));
+        }
+    }
+
+    /**
+     * Save tile entities to a separate file named "tiles.dat" if the tiles 
+     * were added to tiles list during the process of block saving.
+     */
+    private void saveTileEntities(File folder) throws IOException
+    {
+        if (tiles.tagCount() == 0)
+        {
+            return;
+        }
+
         NBTTagCompound output = new NBTTagCompound();
 
-        for (EntityLivingBase entity : world.getEntitiesWithinAABB(EntityLivingBase.class, aabb))
+        output.setTag("Tiles", this.tiles);
+        CompressedStreamTools.write(output, new File(folder + "/tiles.dat"));
+    }
+
+    /**
+     * Save entities to a separate file "entities.dat" in given folder 
+     */
+    private void saveEntities(File folder) throws IOException
+    {
+        AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
+        NBTTagCompound output = new NBTTagCompound();
+        List<EntityLivingBase> entities = world.getEntitiesWithinAABB(EntityLivingBase.class, aabb);
+
+        if (entities.isEmpty()) return;
+
+        for (EntityLivingBase entity : entities)
         {
             NBTTagCompound tag = entity.writeToNBT(new NBTTagCompound());
 
@@ -71,18 +130,6 @@ public class RegionExporter
 
         output.setTag("Entities", this.entities);
 
-        File entities = new File(folder + "/entities.dat");
-        CompressedStreamTools.write(output, entities);
-    }
-
-    private void saveBlock(RandomAccessFile file, int i, int j, int k) throws IOException
-    {
-        IBlockState state = world.getBlockState(this.range.min.add(i, j, k));
-
-        int id = Block.getIdFromBlock(state.getBlock());
-        int meta = state.getBlock().getMetaFromState(state);
-
-        file.writeShort(id);
-        file.writeByte(meta);
+        CompressedStreamTools.write(output, new File(folder + "/entities.dat"));
     }
 }
