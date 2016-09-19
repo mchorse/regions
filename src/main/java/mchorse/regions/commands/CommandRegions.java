@@ -3,6 +3,9 @@ package mchorse.regions.commands;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import mchorse.regions.Regions;
 import mchorse.regions.regions.RegionExporter;
@@ -82,8 +85,17 @@ public class CommandRegions extends CommandBase
         }
     }
 
+    @Override
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    {
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, Arrays.asList("define", "save", "restore")) : Collections.<String> emptyList();
+    }
+
     /**
-     * Define a region 
+     * Define a region.
+     * 
+     * This method responsible for checking if input data is valid, and if it's 
+     * valid, then region range should be saved to a file.
      */
     private void defineRegion(MinecraftServer server, ICommandSender sender, String name, BlockPos min, BlockPos max) throws CommandException
     {
@@ -123,7 +135,10 @@ public class CommandRegions extends CommandBase
     }
 
     /**
-     * Save a region 
+     * Save a region.
+     * 
+     * This method is responsible for validation of input data, i.e. if region 
+     * exists. If region exists, then current state of region will be saved. 
      */
     private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {

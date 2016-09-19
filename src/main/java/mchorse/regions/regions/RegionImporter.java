@@ -5,6 +5,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -41,6 +48,30 @@ public class RegionImporter
         }
 
         file.close();
+
+        File entityFile = new File(folder + "/entities.dat");
+
+        if (!entityFile.exists()) return;
+
+        /* Remove all entities within region */
+        AxisAlignedBB aabb = new AxisAlignedBB(this.range.min, this.range.max);
+
+        for (Entity entity : world.getEntitiesWithinAABB(Entity.class, aabb))
+        {
+            entity.setDead();
+        }
+
+        /* Load entities */
+        NBTTagCompound entities = CompressedStreamTools.read(entityFile);
+        NBTTagList list = (NBTTagList) entities.getTag("Entities");
+
+        for (int i = 0; i < list.tagCount(); i++)
+        {
+            NBTTagCompound tag = list.getCompoundTagAt(i);
+            EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag, world);
+
+            world.spawnEntityInWorld(entity);
+        }
     }
 
     @SuppressWarnings("deprecation")
