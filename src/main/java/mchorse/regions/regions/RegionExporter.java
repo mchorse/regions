@@ -3,8 +3,6 @@ package mchorse.regions.regions;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -22,15 +20,13 @@ public class RegionExporter
     public RegionRange range;
     public World world;
 
-    public List<Short> ids = new ArrayList<Short>();
-
     public RegionExporter(RegionRange range, World world)
     {
         this.range = range;
         this.world = world;
     }
 
-    public void export(File folder) throws IOException
+    public void exportRegion(File folder) throws IOException
     {
         File blocks = new File(folder + "/blocks.dat");
         RandomAccessFile file = new RandomAccessFile(blocks, "rw");

@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 
 import mchorse.regions.Regions;
 import mchorse.regions.regions.RegionExporter;
+import mchorse.regions.regions.RegionImporter;
 import mchorse.regions.regions.RegionRange;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -123,13 +124,16 @@ public class CommandRegions extends CommandBase
 
     /**
      * Save a region 
-     * 
-     * @todo implement
      */
     private void saveRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {
         File region = Regions.serverFile("regions/" + name + "/region.dat");
         File save = Regions.serverFile("regions/" + name + "/" + state + "/");
+
+        if (!region.exists())
+        {
+            throw new CommandException("regions.error.region_undefined", name);
+        }
 
         save.mkdirs();
 
@@ -144,7 +148,7 @@ public class CommandRegions extends CommandBase
 
             RegionExporter exporter = new RegionExporter(range, server.worldServerForDimension(0));
 
-            exporter.export(save);
+            exporter.exportRegion(save);
         }
         catch (IOException e)
         {
@@ -156,11 +160,40 @@ public class CommandRegions extends CommandBase
 
     /**
      * Restore a region 
-     * 
-     * @todo implement
      */
     private void restoreRegion(MinecraftServer server, ICommandSender sender, String name, String state) throws CommandException
     {
+        File region = Regions.serverFile("regions/" + name + "/region.dat");
+        File save = Regions.serverFile("regions/" + name + "/" + state + "/");
 
+        if (!region.exists())
+        {
+            throw new CommandException("regions.error.region_undefined", name);
+        }
+
+        if (!save.exists())
+        {
+            throw new CommandException("regions.error.state_undefined", name, state);
+        }
+
+        RegionRange range = new RegionRange();
+
+        try
+        {
+            RandomAccessFile file = new RandomAccessFile(region, "rw");
+
+            range.read(file);
+            file.close();
+
+            RegionImporter importer = new RegionImporter(range, server.worldServerForDimension(0));
+
+            importer.importRegion(save);
+        }
+        catch (IOException e)
+        {
+            throw new CommandException("regions.error.io", e.getMessage());
+        }
+
+        sender.addChatMessage(new TextComponentTranslation("regions.success.region_restored", name, state));
     }
 }
