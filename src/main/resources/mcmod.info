@@ -2,10 +2,10 @@
 	{
 		"modid": "regions",
 		"name": "Regions",
-		"description": "Example placeholder mod.",
+		"description": "Minecraft single-command mod that allows save and restore world regions",
 		"version": "${version}",
 		"mcversion": "${mcversion}",
-  		"url": "",
+		"url": "https://github.com/mchorse/regions/",
 		"updateUrl": "",
 		"authorList": ["mchorse"],
 		"credits": "The Forge and FML guys, for making Forge",
