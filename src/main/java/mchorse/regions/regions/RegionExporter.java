@@ -131,7 +131,7 @@ public class RegionExporter
         {
             if (entity instanceof EntityPlayer)
             {
-                return;
+                continue;
             }
 
             NBTTagCompound tag = entity.writeToNBT(new NBTTagCompound());
