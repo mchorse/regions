@@ -30,7 +30,7 @@ public class CommandRegions extends CommandBase
     @Override
     public String getCommandName()
     {
-        return "regions";
+        return "region";
     }
 
     @Override
