@@ -12,6 +12,6 @@ It's not a really good idea to define big regions (as it may crash the game or c
 
 * `/regions define <region> <x1> <y1> <z1> <x2> <y2> <z2>` – defines a region that can be saved or restored.
 * `/regions save <region> <state> [save_entities]` saves region `<region>` with state id `<state>` and optionally saves entities in that region. By default, `/regions save` saves entities.
-* `/regions restore <region> <state>` restores 
+* `/regions restore <region> <state>` restores given `<region>` with given `<state>`.
 
 Basically, first you define a region. Then you save a region with given state. When region is being saved, the command copies all blocks, tile entities and entities (depending on `[save_entities]` argument) to a folder in world's save, and when you restore a region, those data are being copied back into the world.

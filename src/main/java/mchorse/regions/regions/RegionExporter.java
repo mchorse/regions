@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -30,6 +31,7 @@ public class RegionExporter
 
     public NBTTagList tiles = new NBTTagList();
     public NBTTagList entities = new NBTTagList();
+
     public boolean saveEntities = true;
 
     public RegionExporter(RegionRange range, World world)
@@ -127,10 +129,15 @@ public class RegionExporter
 
         for (EntityLivingBase entity : entities)
         {
+            if (entity instanceof EntityPlayer)
+            {
+                return;
+            }
+
             NBTTagCompound tag = entity.writeToNBT(new NBTTagCompound());
+            String id = EntityList.getEntityStringFromClass(entity.getClass());
 
-            tag.setString("id", EntityList.getEntityStringFromClass(entity.getClass()));
-
+            tag.setString("id", id);
             this.entities.appendTag(tag);
         }
 
