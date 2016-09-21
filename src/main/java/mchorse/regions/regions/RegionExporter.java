@@ -116,8 +116,12 @@ public class RegionExporter
      */
     private void saveEntities(File folder) throws IOException
     {
+        File file = new File(folder + "/entities.dat");
+
         if (!this.saveEntities)
         {
+            if (file.exists()) file.delete();
+
             return;
         }
 
@@ -143,6 +147,6 @@ public class RegionExporter
 
         output.setTag("Entities", this.entities);
 
-        CompressedStreamTools.write(output, new File(folder + "/entities.dat"));
+        CompressedStreamTools.write(output, file);
     }
 }
