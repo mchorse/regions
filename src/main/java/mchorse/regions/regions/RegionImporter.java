@@ -141,8 +141,8 @@ public class RegionImporter
             entity.setDead();
         }
 
-        /* Schedule entity spawn on the next tick (to avoid conflict with 
-         * already existing entities) */
+        /* Schedule entity spawn later (to avoid conflict with already existing 
+         * entities who share same UUID) */
         new EntityImporter(this.world, list).attach();
     }
 }
