@@ -73,9 +73,11 @@ public class RegionImporter
         int id = file.readShort();
         int meta = file.readByte();
 
+        BlockPos pos = this.range.min.add(i, j, k);
         Block block = Block.getBlockById(id);
 
-        world.setBlockState(this.range.min.add(i, j, k), block.getStateFromMeta(meta));
+        world.removeTileEntity(pos);
+        world.setBlockState(pos, block.getStateFromMeta(meta));
     }
 
     /**
