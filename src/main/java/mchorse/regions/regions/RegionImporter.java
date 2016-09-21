@@ -6,8 +6,7 @@ import java.io.RandomAccessFile;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -16,6 +15,12 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * Region importer
+ * 
+ * This class is responsible for importing saved state from given folder into 
+ * given region range and world.
+ */
 public class RegionImporter
 {
     public RegionRange range;
@@ -116,7 +121,7 @@ public class RegionImporter
 
         /* Load entities */
         NBTTagCompound entities = CompressedStreamTools.read(entityFile);
-        NBTTagList list = (NBTTagList) entities.getTag("Entities");
+        final NBTTagList list = (NBTTagList) entities.getTag("Entities");
 
         if (list.tagCount() == 0)
         {
@@ -128,15 +133,16 @@ public class RegionImporter
 
         for (Entity entity : world.getEntitiesWithinAABB(Entity.class, aabb))
         {
+            if (entity instanceof EntityPlayer)
+            {
+                continue;
+            }
+
             entity.setDead();
         }
 
-        for (int i = 0; i < list.tagCount(); i++)
-        {
-            NBTTagCompound tag = list.getCompoundTagAt(i);
-            EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag, world);
-
-            world.spawnEntityInWorld(entity);
-        }
+        /* Schedule entity spawn on the next tick (to avoid conflict with 
+         * already existing entities) */
+        new EntityImporter(this.world, list).attach();
     }
 }
