@@ -100,15 +100,26 @@ public class RegionExporter
      */
     private void saveTileEntities(File folder) throws IOException
     {
+        File file = new File(folder + "/tiles.dat");
+
         if (tiles.tagCount() == 0)
         {
+            /* Crash fix: remove file in case if it's already exist 
+             * 
+             * ITickable tiles may crash the game if they're being imported 
+             * from previously exported tiles that had appropriate block, but 
+             * more recent save doesn't have that tile, however it didn't 
+             * removed the file.
+             */
+            if (file.exists()) file.delete();
+
             return;
         }
 
         NBTTagCompound output = new NBTTagCompound();
 
         output.setTag("Tiles", this.tiles);
-        CompressedStreamTools.write(output, new File(folder + "/tiles.dat"));
+        CompressedStreamTools.write(output, file);
     }
 
     /**
