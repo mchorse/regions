@@ -77,7 +77,7 @@ public class RegionImporter
         Block block = Block.getBlockById(id);
 
         world.removeTileEntity(pos);
-        world.setBlockState(pos, block.getStateFromMeta(meta));
+        world.setBlockState(pos, block.getStateFromMeta(meta), 2);
     }
 
     /**
