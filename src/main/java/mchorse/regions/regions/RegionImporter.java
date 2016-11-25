@@ -102,7 +102,7 @@ public class RegionImporter
 
         for (int i = 0; i < entities.tagCount(); i++)
         {
-            TileEntity entity = TileEntity.create(entities.getCompoundTagAt(i));
+            TileEntity entity = TileEntity.func_190200_a(this.world, entities.getCompoundTagAt(i));
 
             world.setTileEntity(entity.getPos(), entity);
         }
