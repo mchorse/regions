@@ -40,6 +40,15 @@ public class CommandRegions extends CommandBase
     }
 
     /**
+     * This command should be allowed in the command blocks. 
+     */
+    @Override
+    public int getRequiredPermissionLevel()
+    {
+        return 2;
+    }
+
+    /**
      * Execute the command. Delegate sub-actions to private methods of this 
      * command.
      */
